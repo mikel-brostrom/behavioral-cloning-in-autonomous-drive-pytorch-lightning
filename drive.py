@@ -26,7 +26,6 @@ from io import BytesIO
 #load our saved model
 import torch
 from torch.autograd import Variable
-from model import *
 import torchvision.transforms as transforms
 #helper class
 import utils
@@ -147,7 +146,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Remote Driving')
     parser.add_argument(
         '--model_path',
-        default='default/version_90/checkpoints/best.ckpt',
+        default='logs/car_simple_model/version_5/checkpoints/best.ckpt',
         type=str,
         help='Path to model checkpoint'
     )
