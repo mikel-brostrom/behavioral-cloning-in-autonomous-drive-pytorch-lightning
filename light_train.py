@@ -19,7 +19,12 @@ def train():
     dm = DataModule()
     dm.prepare_data()
     dm.setup()
-    logger = pl.loggers.TensorBoardLogger(save_dir='./')
+    logger = pl.loggers.TensorBoardLogger(
+        save_dir=str('./logs'),
+        name='car_simple_model',
+        default_hp_metric=False,
+    )
+
     checkpoint_callbacks = [
         ModelCheckpoint(monitor="valid/loss", mode="min", filename="best", save_last=True),
     ]
