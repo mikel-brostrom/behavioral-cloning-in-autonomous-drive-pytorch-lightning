@@ -28,7 +28,7 @@ import torch
 from torch.autograd import Variable
 import torchvision.transforms as transforms
 #helper class
-import utils
+from dataset import augument_img, preprocess
 from light_module import LightningModel
 
 #initialize our server
@@ -89,8 +89,13 @@ def telemetry(sid, data):
         original_image = Image.open(BytesIO(base64.b64decode(data["image"])))
         try:
             image = np.asarray(original_image)       # from PIL image to numpy array
-            image = utils.preprocess(image) # apply the preprocessing
+            image = preprocess(image) # apply the preprocessing
+            image, _ = augument_img(image, 0)
+
+            #print('\nBefore preprocess', image.shape)
+            
             image = transformations(image)
+
             image = torch.Tensor(image)
             #image = np.array([image])       # the model expects 4D array
 
@@ -146,7 +151,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Remote Driving')
     parser.add_argument(
         '--model_path',
-        default='logs/car_simple_model/version_5/checkpoints/best.ckpt',
+        default='logs/car_simple_model/version_0/checkpoints/best.ckpt',
         type=str,
         help='Path to model checkpoint'
     )
