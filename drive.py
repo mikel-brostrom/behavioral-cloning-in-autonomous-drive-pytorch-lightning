@@ -28,8 +28,8 @@ import torch
 from torch.autograd import Variable
 import torchvision.transforms as transforms
 #helper class
-from dataset import augument_img, preprocess
-from light_module import LightningModel
+from model import LightningModel
+import albumentations as albu
 
 #initialize our server
 sio = socketio.Server()
@@ -40,12 +40,20 @@ model = None
 prev_image_array = None
 
 #set min/max speed for our autonomous car
-MAX_SPEED = 15
-MIN_SPEED = 10
+MAX_SPEED = 20
+MIN_SPEED = 20
 
 #and a speed limit
 speed_limit = MAX_SPEED
-transformations = transforms.Compose([transforms.Lambda(lambda x: x/127.5 - 1)])
+
+
+image_transforms = albu.Compose(
+    [
+        # (160, 320, 3) ---> (75, 320, 3), remove sky and car front
+        albu.Crop(0, 60, 320, 160-25),
+        albu.Normalize(always_apply=True)
+    ]
+)
 
 class SimplePIController:
     def __init__(self, Kp, Ki):
@@ -89,12 +97,8 @@ def telemetry(sid, data):
         original_image = Image.open(BytesIO(base64.b64decode(data["image"])))
         try:
             image = np.asarray(original_image)       # from PIL image to numpy array
-            image = preprocess(image) # apply the preprocessing
-            image, _ = augument_img(image, 0)
-
-            #print('\nBefore preprocess', image.shape)
-            
-            image = transformations(image)
+           
+            image = image_transforms(image=image)["image"]
 
             image = torch.Tensor(image)
             #image = np.array([image])       # the model expects 4D array
@@ -151,7 +155,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Remote Driving')
     parser.add_argument(
         '--model_path',
-        default='logs/car_simple_model/version_0/checkpoints/best.ckpt',
+        default='logs/car_simple_model/version_69/checkpoints/best.ckpt',
         type=str,
         help='Path to model checkpoint'
     )
