@@ -1,5 +1,7 @@
 # End-to-End Deep Learning for Self-Driving Cars Car using Pytorch Lightning
 
+![](self_driving_example.gif)
+
 ## Simullator installation
 
 Install the simulator following:
