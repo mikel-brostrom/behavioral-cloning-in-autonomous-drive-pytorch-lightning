@@ -40,8 +40,8 @@ model = None
 prev_image_array = None
 
 #set min/max speed for our autonomous car
-MAX_SPEED = 20
-MIN_SPEED = 20
+MAX_SPEED = 10
+MIN_SPEED = 5
 
 #and a speed limit
 speed_limit = MAX_SPEED
@@ -96,13 +96,15 @@ def telemetry(sid, data):
         # The current image from the center camera of the car
         original_image = Image.open(BytesIO(base64.b64decode(data["image"])))
         try:
-            image = np.asarray(original_image)       # from PIL image to numpy array
-           
+            # from PIL image to numpy array
+            image = np.asarray(original_image)       
+            # apply only necessary tranformations for inference 
             image = image_transforms(image=image)["image"]
 
             image = torch.Tensor(image)
-            #image = np.array([image])       # the model expects 4D array
+            print(image.size())
 
+            # conform with model input requirements
             image = image.view(1, 3, 75, 320)
             image = Variable(image)
             
